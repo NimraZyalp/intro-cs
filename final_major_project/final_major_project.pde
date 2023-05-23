@@ -20,7 +20,24 @@ void setup() {
 }
 
 void draw() {
-  background(220);
+    // Set gradient start and end colors
+  int gradientStart = color(0, 0, 255);   // Blue color
+  int gradientEnd = color(128, 0, 128);  // Purple color
+
+  // Draw gradient background
+  for (int y = 0; y < height; y++) {
+    // Calculate the current color based on the gradient
+    int gradientColor = lerpColor(gradientStart, gradientEnd, (float)y / height);
+  
+    // Set the current row of pixels with the gradient color
+    for (int x = 0; x < width; x++) {
+      set(x, y, gradientColor);
+    }
+  }
+
+  // Update the display to show the gradient background
+  updatePixels();
+
   
   if (gameStarted) {
     if (isPlaying) {
@@ -55,9 +72,18 @@ void draw() {
   } else {
     // Starting Menu
     if (!gameStarted && !gameOver) {
-      textAlign(CENTER);
-      textSize(24);
-      text("Press any key to start", width / 2, height / 2);
+     background(220);
+    textAlign(CENTER);
+    textSize(24);
+    fill(0);
+    text("Welcome to Hyper Hurdles!", width / 2, height / 2 - 50);
+    textSize(20);
+    text("Instructions:", width / 2, height / 2);
+    textSize(14);
+    text("- Use the left and right arrow keys to move the player", width / 2, height / 2 + 50);
+    text("- Avoid the obstacles and survive as long as possible", width / 2, height / 2 + 80);
+    textSize(20);
+    text("Press any key to start", width / 2, height / 2 + 150);
     }
   }
   
@@ -86,13 +112,47 @@ void player() {
   fill(0, 0, 255);
   rectMode(CENTER);
   rect(playerX, playerY, playerSize, playerSize);
-  
-  // Move player with arrow keys
-  if (keyCode == LEFT && playerX > playerSize / 2) {
-    playerX -= 5;
-  } else if (keyCode == RIGHT && playerX < width - playerSize / 2) {
-    playerX += 5;
+  // Check collision with left wall
+  if (playerX - playerSize / 2 < 0 || playerX + playerSize / 2 > width) {
+  // Game Over
+    isPlaying = false;
+    gameOver = true;
+    // Update high score if current score is higher
+    if (score > highScore) {
+      highScore = score;
+    }
+    return;  // Exit the function to prevent further player movement
   }
+
+  
+  if (keyCode == LEFT) {
+  if (playerX - playerSize / 2 > 0) {
+    playerX -= 5;
+  } else {
+    // Game Over
+    isPlaying = false;
+    gameOver = true;
+    // Update high score if current score is higher
+    if (score > highScore) {
+      highScore = score;
+    }
+    return;  // Exit the function to prevent further player movement
+  }
+}   else if (keyCode == RIGHT) {
+    if (playerX + playerSize / 2 < width) {
+      playerX += 5;
+  }   else {
+      // Game Over
+      isPlaying = false;
+      gameOver = true;
+      // Update high score if current score is higher
+      if (score > highScore) {
+        highScore = score;
+    }
+      return;  // Exit the function to prevent further player movement
+  }
+}
+
 }
 
 void obstacle() {
